@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No. 1 Magazines</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 32px;
+      color: #f7f0de;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at 68% 22%, rgba(244, 198, 109, 0.2), transparent 30%),
+        linear-gradient(140deg, #080b12, #15263a);
+    }
+
+    main {
+      min-height: calc(100vh - 64px);
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(260px, 0.82fr) minmax(520px, 1.18fr);
+      gap: clamp(32px, 6vw, 86px);
+      align-items: center;
+    }
+
+    a {
+      color: #9fd8cb;
+      font-family: Arial, Helvetica, sans-serif;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 22px 0 18px;
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 400;
+      line-height: 0.95;
+    }
+
+    p {
+      color: #c9bfac;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 1.08rem;
+      line-height: 1.8;
+    }
+
+    .project-copy {
+      justify-self: start;
+      max-width: 520px;
+    }
+
+    .book-stage {
+      position: relative;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1800px;
+    }
+
+    .book-stack {
+      position: relative;
+      width: min(100%, 680px);
+      height: 430px;
+    }
+
+    .mag-book {
+      --cover: #5c6c86;
+      --paper: #f2ecdd;
+      --ink: #1b2230;
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      width: 220px;
+      height: 315px;
+      border: 0;
+      padding: 0;
+      color: var(--ink);
+      font: inherit;
+      cursor: pointer;
+      background: transparent;
+      transform:
+        translate(-50%, -50%)
+        translateX(var(--stack-x))
+        translateY(var(--stack-y))
+        rotate(var(--stack-rotate));
+      transform-style: preserve-3d;
+      transition: transform 260ms ease, filter 260ms ease, z-index 0ms 260ms;
+      z-index: var(--stack-layer);
+    }
+
+    .mag-book:hover,
+    .mag-book:focus-visible {
+      transform:
+        translate(-50%, -50%)
+        translateX(var(--stack-x))
+        translateY(calc(var(--stack-y) - 24px))
+        rotate(var(--stack-rotate));
+      filter: drop-shadow(0 24px 24px rgba(0, 0, 0, 0.36));
+      outline: none;
+    }
+
+    .mag-book.is-open {
+      width: 430px;
+      z-index: 20;
+      transform: translate(-50%, -50%) translateX(34px) translateY(-18px) rotate(0deg);
+      filter: drop-shadow(0 34px 30px rgba(0, 0, 0, 0.42));
+      transition: transform 320ms ease, filter 260ms ease, z-index 0ms;
+    }
+
+    .mag-book.is-open:hover,
+    .mag-book.is-open:focus-visible {
+      transform: translate(-50%, -50%) translateX(34px) translateY(-28px) rotate(0deg);
+    }
+
+    .book-controls {
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      display: flex;
+      gap: 18px;
+      transform: translateX(-50%);
+      z-index: 30;
+    }
+
+    .book-arrow {
+      display: inline-grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(247, 240, 222, 0.34);
+      border-radius: 50%;
+      color: #f7f0de;
+      background: rgba(7, 10, 16, 0.52);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .book-arrow:hover,
+    .book-arrow:focus-visible {
+      transform: translateY(-3px);
+      background: rgba(159, 216, 203, 0.18);
+      border-color: rgba(159, 216, 203, 0.78);
+      outline: none;
+    }
+
+    .book-closed,
+    .book-open {
+      position: absolute;
+      inset: 0;
+      display: block;
+      transition: opacity 220ms ease;
+    }
+
+    .book-closed {
+      border-radius: 4px 10px 10px 4px;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.32) 0 12%, transparent 13%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.18), transparent 36%),
+        var(--cover);
+      box-shadow:
+        inset 12px 0 0 rgba(0, 0, 0, 0.2),
+        inset -8px 0 14px rgba(255, 255, 255, 0.14),
+        0 22px 36px rgba(0, 0, 0, 0.34);
+      transform-origin: left center;
+    }
+
+    .book-closed::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 3px 8px 8px 3px;
+      pointer-events: none;
+    }
+
+    .book-title,
+    .book-year {
+      position: absolute;
+      left: 34px;
+      right: 22px;
+      color: rgba(255, 255, 255, 0.86);
+      text-align: left;
+    }
+
+    .book-title {
+      top: 34px;
+      font-size: 1.45rem;
+      line-height: 1.05;
+    }
+
+    .book-year {
+      bottom: 28px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+
+    .book-open {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: rotateY(10deg);
+      transform-origin: left center;
+    }
+
+    .mag-book.is-open .book-closed {
+      opacity: 0;
+      transform: rotateY(-120deg);
+      pointer-events: none;
+    }
+
+    .mag-book.is-open .book-open {
+      opacity: 1;
+      transform: rotateY(0deg);
+      pointer-events: auto;
+      transition-delay: 120ms;
+    }
+
+    .book-page {
+      position: relative;
+      min-height: 315px;
+      padding: 24px;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.12), transparent 12%),
+        repeating-linear-gradient(0deg, transparent 0 27px, rgba(27, 34, 48, 0.12) 28px 29px),
+        var(--paper);
+      box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.12);
+      text-align: left;
+    }
+
+    .book-page:first-child {
+      border-radius: 8px 0 0 8px;
+      transform-origin: right center;
+    }
+
+    .book-page:last-child {
+      border-left: 1px solid rgba(27, 34, 48, 0.2);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .book-page strong {
+      display: block;
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+      line-height: 1.2;
+    }
+
+    .book-page span {
+      display: block;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.7;
+    }
+
+    .preview-page-image {
+      width: 100%;
+      height: 100%;
+      min-height: 265px;
+      display: block;
+      object-fit: cover;
+      border-radius: inherit;
+    }
+
+    .reader-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      background: rgba(4, 7, 12, 0.78);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+
+    .reader-overlay.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .reader-shell {
+      position: relative;
+      width: min(94vw, 1180px);
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+    }
+
+    .reader-book {
+      position: relative;
+      width: min(94vw, 1060px);
+      aspect-ratio: 1.55;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      perspective: 2200px;
+      filter: drop-shadow(0 34px 42px rgba(0, 0, 0, 0.48));
+    }
+
+    .reader-page {
+      position: relative;
+      border: 0;
+      padding: 0;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.16), transparent 12%),
+        #f1eadb;
+      cursor: pointer;
+    }
+
+    .reader-page:first-child {
+      border-radius: 12px 0 0 12px;
+      transform-origin: right center;
+    }
+
+    .reader-page:last-child {
+      border-left: 1px solid rgba(20, 22, 26, 0.24);
+      border-radius: 0 12px 12px 0;
+      transform-origin: left center;
+    }
+
+    .reader-page.is-flipping-left {
+      animation: flip-left 360ms ease;
+    }
+
+    .reader-page.is-flipping-right {
+      animation: flip-right 360ms ease;
+    }
+
+    .reader-page img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      background: #111;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    }
+
+    .reader-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      color: #f7f0de;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .reader-arrow,
+    .reader-close {
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(247, 240, 222, 0.34);
+      color: #f7f0de;
+      background: rgba(7, 10, 16, 0.52);
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .reader-arrow {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 1.45rem;
+    }
+
+    .reader-close {
+      position: absolute;
+      right: 0;
+      top: -58px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+    }
+
+    .reader-arrow:hover,
+    .reader-arrow:focus-visible,
+    .reader-close:hover,
+    .reader-close:focus-visible {
+      transform: translateY(-3px);
+      background: rgba(159, 216, 203, 0.18);
+      border-color: rgba(159, 216, 203, 0.78);
+      outline: none;
+    }
+
+    .reader-count {
+      min-width: 112px;
+      text-align: center;
+    }
+
+    body.reader-open {
+      overflow: hidden;
+    }
+
+    @keyframes flip-left {
+      0% {
+        transform: rotateY(0deg);
+      }
+
+      50% {
+        transform: rotateY(14deg);
+      }
+
+      100% {
+        transform: rotateY(0deg);
+      }
+    }
+
+    @keyframes flip-right {
+      0% {
+        transform: rotateY(0deg);
+      }
+
+      50% {
+        transform: rotateY(-14deg);
+      }
+
+      100% {
+        transform: rotateY(0deg);
+      }
+    }
+
+    .mag-book:nth-child(1) {
+      --cover: #66788f;
+      --stack-x: -150px;
+      --stack-y: 28px;
+      --stack-rotate: -4deg;
+      --stack-layer: 4;
+    }
+
+    .mag-book:nth-child(2) {
+      --cover: #8b6d82;
+      --stack-x: -18px;
+      --stack-y: 18px;
+      --stack-rotate: -2deg;
+      --stack-layer: 3;
+    }
+
+    .mag-book:nth-child(3) {
+      --cover: #657a6d;
+      --stack-x: 116px;
+      --stack-y: 22px;
+      --stack-rotate: 2deg;
+      --stack-layer: 2;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .book-stage {
+        min-height: 560px;
+        overflow-x: hidden;
+      }
+
+      .mag-book {
+        width: 178px;
+        height: 255px;
+      }
+
+      .mag-book.is-open {
+        width: min(92vw, 360px);
+        transform: translate(-50%, -50%) translateX(0) translateY(-16px) rotate(0deg);
+      }
+
+      .book-page {
+        min-height: 255px;
+        padding: 18px;
+      }
+
+      .reader-book {
+        grid-template-columns: 1fr;
+        aspect-ratio: 0.72;
+        width: min(90vw, 430px);
+      }
+
+      .reader-page:first-child {
+        display: none;
+      }
+
+      .reader-page:last-child {
+        border-left: 0;
+        border-radius: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="project-copy">
+      <a href="index.html#projects">Back to projects</a>
+      <h1>No. 1 Magazines</h1>
+      <p>Almost every semester I like to reflect back and make magazines of the highlights. In this gallery I showcase some of my favorites.</p>
+    </section>
+
+    <section class="book-stage" aria-label="Magazine gallery">
+      <div class="book-stack">
+        <button class="mag-book is-open" type="button" aria-expanded="true" data-reader="spring">
+          <span class="book-closed">
+            <span class="book-title">Spring 2026</span>
+            <span class="book-year">Magazine 01</span>
+          </span>
+          <span class="book-open">
+            <span class="book-page">
+              <img class="preview-page-image" src="images/project-one-magazine/spring-01.jpg" alt="Spring magazine page 1">
+            </span>
+            <span class="book-page">
+              <img class="preview-page-image" src="images/project-one-magazine/spring-02.jpg" alt="Spring magazine page 2">
+            </span>
+          </span>
+        </button>
+
+        <button class="mag-book" type="button" aria-expanded="false" data-reader="fallPt2">
+          <span class="book-closed">
+            <span class="book-title">Fall 2025 pt.2</span>
+            <span class="book-year">Magazine 02</span>
+          </span>
+          <span class="book-open">
+            <span class="book-page">
+              <img class="preview-page-image" src="images/project-one-magazine-fall-pt2/fall-pt2-01.jpg" alt="Fall 2025 pt.2 magazine page 1">
+            </span>
+            <span class="book-page">
+              <img class="preview-page-image" src="images/project-one-magazine-fall-pt2/fall-pt2-02.jpg" alt="Fall 2025 pt.2 magazine page 2">
+            </span>
+          </span>
+        </button>
+
+        <button class="mag-book" type="button" aria-expanded="false" data-reader="bookThree">
+          <span class="book-closed">
+            <span class="book-title">Fall 2025 pt.1</span>
+            <span class="book-year">Magazine 03</span>
+          </span>
+          <span class="book-open">
+            <span class="book-page">
+              <img class="preview-page-image" src="images/project-one-magazine-book-three/book-three-01.jpg" alt="Book three magazine page 1">
+            </span>
+            <span class="book-page">
+              <img class="preview-page-image" src="images/project-one-magazine-book-three/book-three-02.jpg" alt="Book three magazine page 2">
+            </span>
+          </span>
+        </button>
+
+      </div>
+
+      <div class="book-controls" aria-label="Magazine controls">
+        <button class="book-arrow" type="button" data-direction="-1" aria-label="Previous magazine">&larr;</button>
+        <button class="book-arrow" type="button" data-direction="1" aria-label="Next magazine">&rarr;</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="reader-overlay" id="magazine-reader" aria-hidden="true">
+    <div class="reader-shell" role="dialog" aria-modal="true" aria-label="Magazine reader">
+      <button class="reader-close" type="button" aria-label="Close magazine reader">x</button>
+      <div class="reader-book">
+        <button class="reader-page" type="button" data-page-side="left" aria-label="Previous magazine spread">
+          <img id="reader-left-image" src="images/project-one-magazine/spring-01.jpg" alt="Spring magazine page 1">
+        </button>
+        <button class="reader-page" type="button" data-page-side="right" aria-label="Next magazine spread">
+          <img id="reader-right-image" src="images/project-one-magazine/spring-02.jpg" alt="Spring magazine page 2">
+        </button>
+      </div>
+      <div class="reader-controls" aria-label="Magazine controls">
+        <button class="reader-arrow" type="button" data-reader-direction="-1" aria-label="Previous spread">&larr;</button>
+        <span class="reader-count" id="reader-count">1-2 / 20</span>
+        <button class="reader-arrow" type="button" data-reader-direction="1" aria-label="Next spread">&rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const magazineBooks = document.querySelectorAll(".mag-book");
+    const bookArrows = document.querySelectorAll(".book-arrow");
+    const readerOverlay = document.getElementById("magazine-reader");
+    const readerShell = document.querySelector(".reader-shell");
+    const readerClose = document.querySelector(".reader-close");
+    const readerLeftImage = document.getElementById("reader-left-image");
+    const readerRightImage = document.getElementById("reader-right-image");
+    const readerCount = document.getElementById("reader-count");
+    const readerPages = document.querySelectorAll(".reader-page");
+    const readerArrows = document.querySelectorAll(".reader-arrow");
+    const magazines = {
+      spring: Array.from({ length: 20 }, (_, index) => ({
+        src: `images/project-one-magazine/spring-${String(index + 1).padStart(2, "0")}.jpg`,
+        alt: `Spring magazine page ${index + 1}`
+      })),
+      fallPt2: Array.from({ length: 14 }, (_, index) => ({
+        src: `images/project-one-magazine-fall-pt2/fall-pt2-${String(index + 1).padStart(2, "0")}.jpg`,
+        alt: `Fall 2025 pt.2 magazine page ${index + 1}`
+      })).sort((firstPage, secondPage) => {
+        const pageOrder = [1, 2, 3, 4, 6, 7, 5, 8, 9, 10, 11, 12, 13, 14];
+        const firstNumber = Number(firstPage.src.match(/fall-pt2-(\d+)/)[1]);
+        const secondNumber = Number(secondPage.src.match(/fall-pt2-(\d+)/)[1]);
+
+        return pageOrder.indexOf(firstNumber) - pageOrder.indexOf(secondNumber);
+      }),
+      bookThree: Array.from({ length: 20 }, (_, index) => ({
+        src: `images/project-one-magazine-book-three/book-three-${String(index + 1).padStart(2, "0")}.jpg`,
+        alt: `Book three magazine page ${index + 1}`
+      }))
+    };
+    let activeBookIndex = 0;
+    let activeSpreadIndex = 0;
+    let activePages = magazines.spring;
+
+    const openBook = (index) => {
+      activeBookIndex = (index + magazineBooks.length) % magazineBooks.length;
+
+      magazineBooks.forEach((item, itemIndex) => {
+        const isSelected = itemIndex === activeBookIndex;
+        item.classList.toggle("is-open", isSelected);
+        item.setAttribute("aria-expanded", String(isSelected));
+      });
+    };
+
+    const showSpread = (spreadIndex, direction = 1) => {
+      const maxSpreadIndex = Math.ceil(activePages.length / 2) - 1;
+      activeSpreadIndex = (spreadIndex + maxSpreadIndex + 1) % (maxSpreadIndex + 1);
+      const leftPage = activePages[activeSpreadIndex * 2];
+      const rightPage = activePages[(activeSpreadIndex * 2) + 1] || leftPage;
+
+      readerLeftImage.src = leftPage.src;
+      readerLeftImage.alt = leftPage.alt;
+      readerRightImage.src = rightPage.src;
+      readerRightImage.alt = rightPage.alt;
+      readerCount.textContent = `${(activeSpreadIndex * 2) + 1}-${Math.min((activeSpreadIndex * 2) + 2, activePages.length)} / ${activePages.length}`;
+
+      const animatedPage = direction > 0 ? readerPages[1] : readerPages[0];
+      animatedPage.classList.remove("is-flipping-left", "is-flipping-right");
+      void animatedPage.offsetWidth;
+      animatedPage.classList.add(direction > 0 ? "is-flipping-right" : "is-flipping-left");
+    };
+
+    const openReader = (readerKey) => {
+      activePages = magazines[readerKey] || magazines.spring;
+      showSpread(0, 1);
+      readerOverlay.classList.add("is-active");
+      readerOverlay.setAttribute("aria-hidden", "false");
+      document.body.classList.add("reader-open");
+    };
+
+    const closeReader = () => {
+      readerOverlay.classList.remove("is-active");
+      readerOverlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("reader-open");
+    };
+
+    magazineBooks.forEach((book, index) => {
+      book.addEventListener("click", (event) => {
+        openBook(index);
+
+        if (book.dataset.reader) {
+          event.stopPropagation();
+          openReader(book.dataset.reader);
+        }
+      });
+    });
+
+    bookArrows.forEach((arrow) => {
+      arrow.addEventListener("click", () => {
+        openBook(activeBookIndex + Number(arrow.dataset.direction));
+      });
+    });
+
+    readerPages.forEach((page) => {
+      page.addEventListener("click", () => {
+        showSpread(activeSpreadIndex + (page.dataset.pageSide === "right" ? 1 : -1), page.dataset.pageSide === "right" ? 1 : -1);
+      });
+    });
+
+    readerArrows.forEach((arrow) => {
+      arrow.addEventListener("click", () => {
+        const direction = Number(arrow.dataset.readerDirection);
+        showSpread(activeSpreadIndex + direction, direction);
+      });
+    });
+
+    readerClose.addEventListener("click", closeReader);
+
+    readerOverlay.addEventListener("click", closeReader);
+
+    readerShell.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+
+    window.addEventListener("keydown", (event) => {
+      if (!readerOverlay.classList.contains("is-active")) {
+        return;
+      }
+
+      if (event.key === "Escape") {
+        closeReader();
+      }
+
+      if (event.key === "ArrowRight") {
+        showSpread(activeSpreadIndex + 1, 1);
+      }
+
+      if (event.key === "ArrowLeft") {
+        showSpread(activeSpreadIndex - 1, -1);
+      }
+    });
+  </script>
+</body>
+</html>

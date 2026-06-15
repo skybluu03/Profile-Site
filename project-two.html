@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No. 2 Annotation &amp; Analysis of Streptomyces griseorubens</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: #f7f0de;
+      font-family: Georgia, "Times New Roman", serif;
+      background: #dce9d9;
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      pointer-events: none;
+    }
+
+    body::before {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.34), transparent 26%),
+        radial-gradient(circle at 78% 64%, rgba(255, 255, 255, 0.22), transparent 30%),
+        linear-gradient(135deg, #eef7e9 0%, #cfe2cf 48%, #b8d2bf 100%);
+    }
+
+    body::after {
+      z-index: -2;
+      background:
+        linear-gradient(90deg, rgba(3, 34, 20, 0.16), rgba(255, 255, 255, 0.1)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23grain)' opacity='.46'/%3E%3C/svg%3E");
+      background-size: auto, 180px 180px;
+      mix-blend-mode: multiply;
+      opacity: 0.7;
+    }
+
+    .strand-background {
+      position: fixed;
+      inset: -18%;
+      z-index: -1;
+      pointer-events: none;
+      filter: blur(10px) contrast(1.36) saturate(0.92);
+      opacity: 0.92;
+    }
+
+    .strand {
+      position: absolute;
+      left: var(--strand-left);
+      top: var(--strand-top);
+      width: var(--strand-width);
+      height: var(--strand-height);
+      border: clamp(18px, 2.4vw, 34px) solid rgba(0, 35, 22, 0.92);
+      border-color: rgba(0, 35, 22, 0.94) rgba(0, 43, 25, 0.86) rgba(0, 22, 14, 0.96);
+      border-radius: 48% 52% 44% 56% / 58% 42% 62% 38%;
+      box-shadow:
+        0 0 24px rgba(0, 28, 17, 0.72),
+        inset 0 0 24px rgba(10, 55, 35, 0.48);
+      transform: rotate(var(--strand-rotate)) scale(var(--strand-scale-x), var(--strand-scale-y));
+      animation: strand-drift var(--strand-speed) ease-in-out infinite alternate;
+      animation-delay: var(--strand-delay);
+      transform-origin: 50% 50%;
+    }
+
+    .strand:nth-child(1) {
+      --strand-left: -10%;
+      --strand-top: -18%;
+      --strand-width: 52vw;
+      --strand-height: 28vh;
+      --strand-rotate: 22deg;
+      --strand-scale-x: 1.22;
+      --strand-scale-y: 0.82;
+      --strand-speed: 24s;
+      --strand-delay: -4s;
+    }
+
+    .strand:nth-child(2) {
+      --strand-left: 16%;
+      --strand-top: 20%;
+      --strand-width: 64vw;
+      --strand-height: 28vh;
+      --strand-rotate: -21deg;
+      --strand-scale-x: 1.18;
+      --strand-scale-y: 0.9;
+      --strand-speed: 30s;
+      --strand-delay: -12s;
+    }
+
+    .strand:nth-child(3) {
+      --strand-left: 60%;
+      --strand-top: 18%;
+      --strand-width: 36vw;
+      --strand-height: 54vh;
+      --strand-rotate: 10deg;
+      --strand-scale-x: 0.82;
+      --strand-scale-y: 1.14;
+      --strand-speed: 28s;
+      --strand-delay: -18s;
+    }
+
+    .strand:nth-child(4) {
+      --strand-left: -16%;
+      --strand-top: 58%;
+      --strand-width: 54vw;
+      --strand-height: 28vh;
+      --strand-rotate: -34deg;
+      --strand-scale-x: 1.28;
+      --strand-scale-y: 0.74;
+      --strand-speed: 34s;
+      --strand-delay: -9s;
+    }
+
+    .strand:nth-child(5) {
+      --strand-left: 42%;
+      --strand-top: 70%;
+      --strand-width: 66vw;
+      --strand-height: 30vh;
+      --strand-rotate: 18deg;
+      --strand-scale-x: 1.16;
+      --strand-scale-y: 0.78;
+      --strand-speed: 32s;
+      --strand-delay: -22s;
+    }
+
+    @keyframes strand-drift {
+      0% {
+        border-radius: 48% 52% 44% 56% / 58% 42% 62% 38%;
+        transform: translate3d(-3vw, -2vh, 0) rotate(var(--strand-rotate)) scale(var(--strand-scale-x), var(--strand-scale-y));
+      }
+
+      50% {
+        border-radius: 58% 42% 54% 46% / 44% 56% 38% 62%;
+      }
+
+      100% {
+        border-radius: 42% 58% 62% 38% / 52% 48% 58% 42%;
+        transform: translate3d(4vw, 3vh, 0) rotate(calc(var(--strand-rotate) + 16deg)) scale(calc(var(--strand-scale-x) * 1.08), calc(var(--strand-scale-y) * 0.96));
+      }
+    }
+
+    .intro-page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px;
+      background: rgba(2, 8, 6, 0.16);
+    }
+
+    .intro-content {
+      max-width: 720px;
+    }
+
+    .intro-content p {
+      color: #f7f0de;
+    }
+
+    a {
+      color: #9fd8cb;
+      font-family: Arial, Helvetica, sans-serif;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 22px 0 18px;
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 400;
+      line-height: 0.95;
+    }
+
+    p {
+      color: #c9bfac;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 1.08rem;
+      line-height: 1.8;
+    }
+
+    .project-page {
+      min-height: 100vh;
+      display: grid;
+      align-items: center;
+      padding: clamp(28px, 6vw, 82px);
+      color: #f7f0de;
+      background: rgba(2, 8, 6, 0.16);
+    }
+
+    .project-layout {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(320px, 1.08fr) minmax(280px, 0.92fr);
+      gap: clamp(34px, 6vw, 78px);
+      align-items: center;
+    }
+
+    .slide-viewer {
+      justify-self: start;
+      width: min(100%, 620px);
+    }
+
+    .slide-frame {
+      position: relative;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .slide-track {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      transition: transform 320ms ease;
+    }
+
+    .slide {
+      flex: 0 0 100%;
+      display: grid;
+      place-items: center;
+      min-height: clamp(300px, 54vw, 520px);
+      padding: clamp(12px, 2vw, 18px);
+      background: transparent;
+    }
+
+    .slide img {
+      display: block;
+      max-width: 100%;
+      max-height: min(70vh, 520px);
+      object-fit: contain;
+      box-shadow: 0 8px 24px rgba(21, 23, 25, 0.12);
+    }
+
+    .slide-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .slide-arrow {
+      display: inline-grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 50%;
+      color: #f7f0de;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.05) 48%, rgba(255, 255, 255, 0.12)),
+        rgba(7, 10, 18, 0.22);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.34),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+        0 16px 34px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(18px) saturate(1.5);
+      -webkit-backdrop-filter: blur(18px) saturate(1.5);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 1.4rem;
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .slide-arrow:hover,
+    .slide-arrow:focus-visible {
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.58);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.42),
+        0 18px 38px rgba(0, 0, 0, 0.36),
+        0 0 24px rgba(171, 210, 250, 0.22);
+      outline: none;
+    }
+
+    .slide-count {
+      min-width: 78px;
+      color: #d7dfef;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .summary h2 {
+      margin: 0 0 22px;
+      color: #f7f0de;
+      font-size: clamp(3rem, 7vw, 5.8rem);
+      font-weight: 400;
+      line-height: 0.98;
+    }
+
+    .summary p {
+      max-width: 520px;
+      color: #c9e2c8;
+    }
+
+    .summary {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 4vw, 46px);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 24px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.05) 44%, rgba(255, 255, 255, 0.12)),
+        rgba(7, 10, 18, 0.22);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.34),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 32px rgba(255, 255, 255, 0.06),
+        0 30px 80px rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(28px) saturate(1.6);
+      -webkit-backdrop-filter: blur(28px) saturate(1.6);
+    }
+
+    .summary::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.34), transparent 32%),
+        radial-gradient(circle at 78% 14%, rgba(255, 255, 255, 0.34), transparent 12%),
+        radial-gradient(circle at 18% 82%, rgba(255, 255, 255, 0.14), transparent 16%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .summary h2,
+    .summary p {
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 860px) {
+      .project-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .slide-viewer {
+        justify-self: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="strand-background" aria-hidden="true">
+    <div class="strand"></div>
+    <div class="strand"></div>
+    <div class="strand"></div>
+    <div class="strand"></div>
+    <div class="strand"></div>
+  </div>
+  <main>
+    <section class="intro-page">
+      <div class="intro-content">
+        <a href="index.html#projects">Back to projects</a>
+        <h1>No. 2 Annotation &amp; Analysis of Streptomyces griseorubens</h1>
+        <p>One of my first deep dives into bioinformatics. This project challenged me to move beyond the classroom, explore new tools independently, and develop a deeper understanding of genome annotation and analysis. While there is still much to learn, this project represents an important milestone and growth in my career.</p>
+      </div>
+    </section>
+
+    <section class="project-page" aria-label="PowerPoint gallery and summary">
+      <div class="project-layout">
+        <div class="slide-viewer">
+          <div class="slide-frame">
+            <div class="slide-track" id="slide-track"></div>
+          </div>
+          <div class="slide-controls" aria-label="PowerPoint controls">
+            <button class="slide-arrow" type="button" data-direction="-1" aria-label="Previous slide">&larr;</button>
+            <span class="slide-count" id="slide-count">1 / 28</span>
+            <button class="slide-arrow" type="button" data-direction="1" aria-label="Next slide">&rarr;</button>
+          </div>
+        </div>
+
+        <div class="summary">
+          <h2>Summary</h2>
+          <p>This project focused on assembling, annotating, and analyzing a microbial genome using Bash tools and Galaxy.eu. Our team performed quality control, optimized read trimming, and compared multiple assembly methods before selecting the best assembly based on QUAST metrics. Protein annotation and analysis were then carried out using PROKKA, RAST, sequence alignment, phylogenetic analysis, and structural prediction tools. Finally, the target protein, D-inositol-3-phosphate glycosyltransferase, was visualized in 3D and inserted into the pET-28a(+) plasmid for potential downstream applications.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const totalSlides = 28;
+    const slideTrack = document.getElementById("slide-track");
+    const slideCount = document.getElementById("slide-count");
+    const slideArrows = document.querySelectorAll(".slide-arrow");
+    let currentSlide = 0;
+
+    for (let index = 1; index <= totalSlides; index += 1) {
+      const slide = document.createElement("div");
+      const image = document.createElement("img");
+
+      slide.className = "slide";
+      image.src = `images/project-two-slides/slide-${String(index).padStart(2, "0")}.png`;
+      image.alt = `PowerPoint slide ${index}`;
+
+      slide.appendChild(image);
+      slideTrack.appendChild(slide);
+    }
+
+    const showSlide = (index) => {
+      currentSlide = (index + totalSlides) % totalSlides;
+      slideTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+      slideCount.textContent = `${currentSlide + 1} / ${totalSlides}`;
+    };
+
+    slideArrows.forEach((arrow) => {
+      arrow.addEventListener("click", () => {
+        showSlide(currentSlide + Number(arrow.dataset.direction));
+      });
+    });
+  </script>
+</body>
+</html>

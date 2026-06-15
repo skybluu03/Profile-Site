@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Shell</title>
+  <style>
+    :root {
+      --ink: #f7f0de;
+      --muted: #c9bfac;
+      --line: rgba(247, 240, 222, 0.68);
+      --panel: rgba(9, 13, 20, 0.68);
+      --accent: #9fd8cb;
+      --warm: #f4c66d;
+      --nav-hover: #1B2CC1;
+      --shadow: rgba(0, 0, 0, 0.38);
+    }
+
+    .landing {
+      --glow-x: 24%;
+      --glow-y: 34%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      background: #0d1117;
+      overflow-x: hidden;
+    }
+
+    .site-nav {
+      position: fixed;
+      z-index: 20;
+      top: 0;
+      left: 0;
+      width: 84px;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 0;
+      background: rgba(6, 9, 13, 0.54);
+      border-right: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .site-nav ul {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 42px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .site-nav a {
+      position: relative;
+      display: inline-flex;
+      justify-content: center;
+      min-height: 92px;
+      color: var(--ink);
+      font-size: 0.78rem;
+      letter-spacing: 0;
+      text-decoration: none;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+      text-orientation: upright;
+      transition: color 180ms ease, transform 180ms ease;
+    }
+
+    .site-nav a::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 0;
+      background: var(--nav-hover);
+      box-shadow: 0 0 18px rgba(27, 44, 193, 0.82);
+      transform: translate(-50%, -50%);
+      transition: height 220ms ease;
+    }
+
+    .site-nav a:hover,
+    .site-nav a:focus-visible {
+      color: var(--nav-hover);
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .site-nav a:hover::after,
+    .site-nav a:focus-visible::after {
+      height: 100%;
+    }
+
+    main {
+      margin-left: 84px;
+    }
+
+    .page-section {
+      min-height: 100vh;
+      position: relative;
+      display: grid;
+      align-items: center;
+      padding: 72px clamp(24px, 7vw, 104px);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .page-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background-attachment: fixed;
+      background-position: center;
+      background-size: cover;
+    }
+
+    .page-section::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at 28% 24%, rgba(159, 216, 203, 0.22), transparent 31%),
+        linear-gradient(90deg, rgba(6, 8, 13, 0.78), rgba(6, 8, 13, 0.3));
+    }
+
+    .landing::before {
+      /* Animated interactive lava-lamp gradient background.
+         The .lava-layer below creates the moving globby shapes. This base
+         layer keeps the full background in the same color family.
+         Colors used:
+         Deep Navy #091540, Dusk Blue #3D518C, Persian Blue #1B2CC1,
+         Cornflower Blue #7692FF, Icy Blue #ABD2FA.
+      */
+      inset: -12%;
+      z-index: -3;
+      background-image:
+        radial-gradient(ellipse at var(--glow-x) var(--glow-y), rgba(171, 210, 250, 0.54), transparent 36%),
+        radial-gradient(ellipse at 76% 24%, rgba(61, 81, 140, 0.7), transparent 42%),
+        linear-gradient(145deg, #091540 0%, #06101f 46%, #030609 100%);
+      filter: saturate(1.1) contrast(1.08);
+      transform: scale(1.02);
+    }
+
+    .landing::after {
+      z-index: 1;
+      background-image:
+        radial-gradient(circle at var(--glow-x) var(--glow-y), rgba(171, 210, 250, 0.08), transparent 28%),
+        linear-gradient(90deg, rgba(5, 8, 13, 0.4), rgba(5, 8, 13, 0.16)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23grain)' opacity='.72'/%3E%3C/svg%3E");
+      background-size: auto, auto, 180px 180px;
+      mix-blend-mode: screen;
+      opacity: 0.92;
+      pointer-events: none;
+    }
+
+    .lava-layer {
+      position: absolute;
+      inset: -24%;
+      z-index: -1;
+      overflow: hidden;
+      filter: blur(48px) contrast(1.3) saturate(1.2);
+      pointer-events: none;
+    }
+
+    .lava-blob {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: var(--blob-width, 44vmax);
+      height: var(--blob-height, 32vmax);
+      border-radius: 44% 56% 62% 38% / 50% 42% 58% 50%;
+      background: var(--blob-color);
+      opacity: var(--blob-opacity, 0.8);
+      transform: translate3d(0, 0, 0);
+      transform-origin: 50% 50%;
+      will-change: transform, border-radius;
+    }
+
+    .lava-blob:nth-child(1) {
+      --blob-width: 52vmax;
+      --blob-height: 34vmax;
+      --blob-color: radial-gradient(ellipse at 42% 50%, rgba(171, 210, 250, 0.92), rgba(118, 146, 255, 0.64) 42%, transparent 72%);
+      --blob-opacity: 0.92;
+    }
+
+    .lava-blob:nth-child(2) {
+      --blob-width: 46vmax;
+      --blob-height: 40vmax;
+      --blob-color: radial-gradient(ellipse at 55% 44%, rgba(118, 146, 255, 0.9), rgba(27, 44, 193, 0.52) 48%, transparent 76%);
+      --blob-opacity: 0.82;
+    }
+
+    .lava-blob:nth-child(3) {
+      --blob-width: 54vmax;
+      --blob-height: 30vmax;
+      --blob-color: radial-gradient(ellipse at 50% 50%, rgba(61, 81, 140, 0.88), rgba(9, 21, 64, 0.64) 54%, transparent 78%);
+      --blob-opacity: 0.9;
+    }
+
+    .lava-blob:nth-child(4) {
+      --blob-width: 58vmax;
+      --blob-height: 38vmax;
+      --blob-color: radial-gradient(ellipse at 45% 55%, rgba(3, 6, 12, 0.96), rgba(3, 6, 12, 0.78) 52%, transparent 76%);
+      --blob-opacity: 0.88;
+    }
+
+    .lava-blob:nth-child(5) {
+      --blob-width: 40vmax;
+      --blob-height: 52vmax;
+      --blob-color: radial-gradient(ellipse at 50% 48%, rgba(171, 210, 250, 0.72), rgba(61, 81, 140, 0.46) 48%, transparent 78%);
+      --blob-opacity: 0.74;
+    }
+
+    .landing .content,
+    .landing .scroll-cue {
+      position: relative;
+      z-index: 2;
+    }
+
+    .projects::before {
+      /* Animated non-interactive night gradient background.
+         Colors used:
+         #0C0C0C, #0B1215, #121212, #171717, #04041B, #101720, #05091E.
+      */
+      z-index: -3;
+      background-image:
+        radial-gradient(ellipse at 74% 22%, rgba(16, 23, 32, 0.72), transparent 38%),
+        radial-gradient(ellipse at 20% 78%, rgba(4, 4, 27, 0.82), transparent 42%),
+        linear-gradient(145deg, #0C0C0C 0%, #0B1215 42%, #05091E 100%);
+    }
+
+    .projects::after {
+      z-index: 1;
+      background-image:
+        linear-gradient(90deg, rgba(5, 5, 8, 0.42), rgba(5, 9, 30, 0.12)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='5' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23grain)' opacity='.55'/%3E%3C/svg%3E");
+      background-size: auto, 180px 180px;
+      mix-blend-mode: screen;
+      opacity: 0.72;
+      pointer-events: none;
+    }
+
+    .night-layer {
+      position: absolute;
+      inset: -24%;
+      z-index: -1;
+      overflow: hidden;
+      filter: blur(54px) contrast(1.28) saturate(1.14);
+      pointer-events: none;
+    }
+
+    .night-blob {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: var(--night-width, 48vmax);
+      height: var(--night-height, 34vmax);
+      border-radius: 48% 52% 58% 42% / 44% 56% 44% 56%;
+      background: var(--night-color);
+      opacity: var(--night-opacity, 0.86);
+      transform: var(--night-start);
+      transform-origin: 50% 50%;
+      will-change: transform, border-radius;
+      animation: night-swirl var(--night-speed, 24s) ease-in-out infinite alternate;
+    }
+
+    .night-blob:nth-child(1) {
+      --night-width: 62vmax;
+      --night-height: 34vmax;
+      --night-color: radial-gradient(ellipse at 46% 50%, rgba(16, 23, 32, 0.96), rgba(5, 9, 30, 0.58) 46%, transparent 76%);
+      --night-opacity: 0.9;
+      --night-speed: 28s;
+      --night-start: translate3d(-4vw, 4vh, 0) rotate(-8deg) scale(1.3, 0.82);
+      --night-end: translate3d(8vw, -7vh, 0) rotate(28deg) scale(1.55, 0.72);
+    }
+
+    .night-blob:nth-child(2) {
+      --night-width: 52vmax;
+      --night-height: 42vmax;
+      --night-color: radial-gradient(ellipse at 52% 48%, rgba(4, 4, 27, 0.96), rgba(11, 18, 21, 0.72) 52%, transparent 78%);
+      --night-opacity: 0.96;
+      --night-speed: 34s;
+      animation-delay: -9s;
+      --night-start: translate3d(44vw, -8vh, 0) rotate(18deg) scale(1.06, 1.18);
+      --night-end: translate3d(34vw, 14vh, 0) rotate(-22deg) scale(1.28, 0.96);
+    }
+
+    .night-blob:nth-child(3) {
+      --night-width: 58vmax;
+      --night-height: 30vmax;
+      --night-color: radial-gradient(ellipse at 50% 50%, rgba(23, 23, 23, 0.94), rgba(18, 18, 18, 0.62) 50%, transparent 80%);
+      --night-opacity: 0.88;
+      --night-speed: 31s;
+      animation-delay: -16s;
+      --night-start: translate3d(16vw, 54vh, 0) rotate(-24deg) scale(1.5, 0.78);
+      --night-end: translate3d(30vw, 44vh, 0) rotate(20deg) scale(1.22, 1.02);
+    }
+
+    .night-blob:nth-child(4) {
+      --night-width: 44vmax;
+      --night-height: 54vmax;
+      --night-color: radial-gradient(ellipse at 50% 50%, rgba(12, 12, 12, 0.98), rgba(4, 4, 27, 0.64) 48%, transparent 76%);
+      --night-opacity: 0.92;
+      --night-speed: 38s;
+      animation-delay: -22s;
+      --night-start: translate3d(62vw, 36vh, 0) rotate(26deg) scale(0.92, 1.46);
+      --night-end: translate3d(48vw, 24vh, 0) rotate(-18deg) scale(1.1, 1.24);
+    }
+
+    .night-blob:nth-child(5) {
+      --night-width: 38vmax;
+      --night-height: 36vmax;
+      --night-color: radial-gradient(ellipse at 50% 50%, rgba(5, 9, 30, 0.92), rgba(16, 23, 32, 0.5) 48%, transparent 78%);
+      --night-opacity: 0.74;
+      --night-speed: 26s;
+      animation-delay: -5s;
+      --night-start: translate3d(28vw, 18vh, 0) rotate(8deg) scale(1.18, 0.94);
+      --night-end: translate3d(18vw, 30vh, 0) rotate(38deg) scale(0.96, 1.18);
+    }
+
+    .projects .content {
+      position: relative;
+      z-index: 2;
+    }
+
+    @keyframes night-swirl {
+      0% {
+        border-radius: 40% 60% 54% 46% / 52% 44% 56% 48%;
+        transform: var(--night-start);
+      }
+
+      50% {
+        border-radius: 62% 38% 44% 56% / 42% 58% 40% 60%;
+      }
+
+      100% {
+        border-radius: 46% 54% 66% 34% / 58% 42% 54% 46%;
+        transform: var(--night-end);
+      }
+    }
+
+    .content {
+      max-width: 980px;
+    }
+
+    .landing .content,
+    .projects .content {
+      transform: translateY(-2vh);
+    }
+
+    .eyebrow {
+      margin: 0 0 18px;
+      color: var(--accent);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2 {
+      max-width: 780px;
+      margin: 0;
+      font-weight: 400;
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: clamp(4rem, 13vw, 9.5rem);
+    }
+
+    h2 {
+      font-size: clamp(3rem, 8vw, 6rem);
+    }
+
+    .lead {
+      max-width: 640px;
+      margin: 26px 0 0;
+      color: var(--muted);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      line-height: 1.8;
+    }
+
+    .scroll-cue {
+      position: absolute;
+      right: clamp(24px, 5vw, 72px);
+      bottom: 34px;
+      color: var(--muted);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+    }
+
+    .about {
+      min-height: 100vh;
+      background:
+        linear-gradient(115deg, rgba(230, 223, 207, 0.96), rgba(187, 201, 197, 0.92)),
+        #d8d3c7;
+      color: #141a20;
+    }
+
+    .about::before,
+    .about::after {
+      display: none;
+    }
+
+    .about-layout {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: minmax(240px, 0.82fr) minmax(280px, 1.18fr);
+      gap: clamp(28px, 6vw, 80px);
+      align-items: center;
+      max-width: 1120px;
+      width: 100%;
+    }
+
+    .about-decoration {
+      position: absolute;
+      z-index: 0;
+      left: clamp(8px, 4vw, 72px);
+      top: 50%;
+      width: auto;
+      height: 118%;
+      max-height: 118vh;
+      opacity: 0.24;
+      pointer-events: none;
+      transform: translateY(-50%);
+      filter: drop-shadow(0 24px 38px rgba(20, 26, 32, 0.12));
+    }
+
+    .about-image {
+      position: relative;
+      justify-self: center;
+      width: clamp(255px, 27vw, 385px);
+      aspect-ratio: 0.72;
+      border: 1px solid rgba(20, 26, 32, 0.22);
+      background:
+        linear-gradient(135deg, rgba(20, 26, 32, 0.08), rgba(20, 26, 32, 0.22)),
+        rgba(255, 255, 255, 0.28);
+      box-shadow: 0 26px 80px rgba(20, 26, 32, 0.16);
+      overflow: hidden;
+    }
+
+    .about-photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .about-copy h2 {
+      max-width: 680px;
+      margin-bottom: 22px;
+      color: #111820;
+    }
+
+    .about-copy {
+      margin-left: clamp(28px, 4vw, 72px);
+      transform: translateY(34px);
+    }
+
+    .about-copy h2::before {
+      /* INSERT ABOUT PAGE TITLE HERE by replacing the text inside the <h2>. */
+    }
+
+    .about-copy p {
+      max-width: 650px;
+      margin: 0 0 16px;
+      color: #354047;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: clamp(1rem, 1.7vw, 1.14rem);
+      line-height: 1.85;
+    }
+
+    .about-copy p::before {
+      /* INSERT ABOUT PAGE BODY PARAGRAPH HERE by replacing the text inside the <p>. */
+    }
+
+    .contact-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 42px;
+      padding: 12px 28px;
+      border: 1px solid #050505;
+      color: #050505;
+      background: transparent;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+    }
+
+    .contact-button:hover,
+    .contact-button:focus-visible {
+      color: #fff;
+      background: #050505;
+      transform: translateY(-2px);
+      outline: none;
+    }
+
+    .contact-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      background: rgba(9, 13, 20, 0.42);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+    }
+
+    .contact-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .contact-card {
+      position: relative;
+      width: min(760px, 92vw);
+      min-height: min(620px, 82vh);
+      padding: clamp(34px, 7vw, 74px);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 28px;
+      color: #f7f0de;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.06) 42%, rgba(255, 255, 255, 0.14)),
+        rgba(10, 14, 20, 0.34);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.34),
+        inset 0 0 38px rgba(255, 255, 255, 0.08),
+        0 34px 90px rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(28px) saturate(1.5);
+      -webkit-backdrop-filter: blur(28px) saturate(1.5);
+    }
+
+    .contact-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 50%;
+      color: #f7f0de;
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+    }
+
+    .contact-card h2 {
+      margin-bottom: 34px;
+      font-size: clamp(3rem, 7vw, 5.6rem);
+    }
+
+    .contact-entry {
+      margin-top: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .contact-entry strong {
+      display: block;
+      margin-bottom: 18px;
+      color: #f7f0de;
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+
+    .contact-entry span {
+      display: block;
+      min-height: 28px;
+      color: rgba(247, 240, 222, 0.62);
+    }
+
+    .pixel-icon {
+      position: relative;
+      width: 92px;
+      height: 82px;
+      display: block;
+    }
+
+    .pixel-icon::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 4px;
+      background: currentColor;
+      box-shadow: var(--pixels);
+    }
+
+    .pixel-mail {
+      --pixels:
+        10px 20px, 15px 20px, 20px 20px, 25px 20px, 30px 20px, 35px 20px, 40px 20px, 45px 20px, 50px 20px, 55px 20px, 60px 20px, 65px 20px, 70px 20px,
+        10px 25px, 20px 25px, 30px 25px, 40px 25px, 50px 25px, 60px 25px, 70px 25px,
+        10px 30px, 15px 30px, 25px 30px, 35px 30px, 45px 30px, 55px 30px, 65px 30px, 70px 30px,
+        10px 35px, 20px 35px, 30px 35px, 40px 35px, 50px 35px, 60px 35px, 70px 35px,
+        10px 40px, 25px 40px, 35px 40px, 45px 40px, 55px 40px, 70px 40px,
+        10px 45px, 20px 45px, 30px 45px, 40px 45px, 50px 45px, 60px 45px, 70px 45px,
+        10px 50px, 15px 50px, 20px 50px, 25px 50px, 30px 50px, 35px 50px, 40px 50px, 45px 50px, 50px 50px, 55px 50px, 60px 50px, 65px 50px, 70px 50px;
+    }
+
+    .pixel-butterfly {
+      --pixels:
+        18px 8px, 22px 8px, 58px 8px, 62px 8px,
+        14px 12px, 18px 12px, 22px 12px, 30px 12px, 50px 12px, 58px 12px, 62px 12px, 66px 12px,
+        10px 16px, 14px 16px, 18px 16px, 26px 16px, 34px 16px, 46px 16px, 54px 16px, 62px 16px, 66px 16px, 70px 16px,
+        10px 20px, 14px 20px, 22px 20px, 30px 20px, 38px 20px, 42px 20px, 50px 20px, 58px 20px, 66px 20px, 70px 20px,
+        14px 24px, 18px 24px, 26px 24px, 34px 24px, 38px 24px, 42px 24px, 46px 24px, 54px 24px, 62px 24px, 66px 24px,
+        18px 28px, 22px 28px, 30px 28px, 38px 28px, 42px 28px, 50px 28px, 58px 28px, 62px 28px,
+        22px 32px, 26px 32px, 34px 32px, 38px 32px, 42px 32px, 46px 32px, 54px 32px, 58px 32px,
+        18px 38px, 22px 38px, 30px 38px, 38px 38px, 42px 38px, 50px 38px, 58px 38px, 62px 38px,
+        14px 42px, 18px 42px, 26px 42px, 38px 42px, 42px 42px, 54px 42px, 62px 42px, 66px 42px,
+        10px 46px, 14px 46px, 22px 46px, 34px 46px, 46px 46px, 58px 46px, 66px 46px, 70px 46px,
+        14px 50px, 18px 50px, 30px 50px, 50px 50px, 62px 50px, 66px 50px,
+        22px 54px, 26px 54px, 54px 54px, 58px 54px;
+    }
+
+    .pixel-flower {
+      --pixels:
+        34px 4px, 38px 4px, 50px 4px, 54px 4px,
+        26px 8px, 30px 8px, 34px 8px, 38px 8px, 42px 8px, 46px 8px, 50px 8px, 54px 8px, 58px 8px,
+        22px 12px, 26px 12px, 30px 12px, 38px 12px, 42px 12px, 46px 12px, 50px 12px, 54px 12px, 58px 12px, 62px 12px,
+        18px 16px, 22px 16px, 30px 16px, 34px 16px, 42px 16px, 46px 16px, 50px 16px, 54px 16px, 62px 16px, 66px 16px,
+        14px 20px, 18px 20px, 26px 20px, 34px 20px, 42px 20px, 50px 20px, 54px 20px, 58px 20px, 62px 20px, 66px 20px,
+        14px 24px, 22px 24px, 30px 24px, 38px 24px, 46px 24px, 54px 24px, 62px 24px, 66px 24px,
+        10px 28px, 14px 28px, 22px 28px, 30px 28px, 34px 28px, 38px 28px, 42px 28px, 46px 28px, 54px 28px, 62px 28px,
+        10px 32px, 18px 32px, 26px 32px, 30px 32px, 34px 32px, 38px 32px, 42px 32px, 46px 32px, 50px 32px, 58px 32px, 62px 32px,
+        14px 36px, 18px 36px, 22px 36px, 30px 36px, 34px 36px, 38px 36px, 42px 36px, 50px 36px, 54px 36px, 58px 36px,
+        18px 40px, 22px 40px, 26px 40px, 34px 40px, 38px 40px, 42px 40px, 46px 40px, 50px 40px, 54px 40px,
+        26px 44px, 30px 44px, 34px 44px, 38px 44px, 42px 44px, 46px 44px, 50px 44px,
+        34px 48px, 38px 48px, 42px 48px,
+        34px 52px, 38px 52px,
+        30px 56px, 34px 56px, 42px 56px, 46px 56px,
+        22px 60px, 26px 60px, 30px 60px, 46px 60px, 50px 60px,
+        14px 64px, 18px 64px, 22px 64px, 50px 64px, 54px 64px, 58px 64px,
+        10px 68px, 14px 68px, 18px 68px, 54px 68px, 58px 68px, 62px 68px;
+    }
+
+    .star-field {
+      position: relative;
+      width: min(78vw, 900px);
+      min-height: 430px;
+      margin-top: 30px;
+    }
+
+    .project-star {
+      position: absolute;
+      display: inline-grid;
+      place-items: center;
+      width: 72px;
+      height: 72px;
+      color: var(--ink);
+      font-size: 3.6rem;
+      line-height: 1;
+      text-decoration: none;
+      text-shadow:
+        0 0 10px rgba(247, 240, 222, 0.78),
+        0 0 24px rgba(159, 216, 203, 0.48);
+      animation: star-breathe 2.8s ease-in-out infinite;
+      transition: color 180ms ease, filter 180ms ease, transform 180ms ease;
+    }
+
+    .project-star span {
+      position: absolute;
+      left: 50%;
+      top: calc(100% + 10px);
+      width: max-content;
+      color: var(--muted);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      transform: translateX(-50%);
+    }
+
+    .project-star:nth-child(1) {
+      top: 8%;
+      left: 12%;
+    }
+
+    .project-star:nth-child(2) {
+      top: 36%;
+      left: 56%;
+      animation-delay: 420ms;
+    }
+
+    .project-star:nth-child(3) {
+      top: 66%;
+      left: 28%;
+      animation-delay: 840ms;
+    }
+
+    .project-star:hover,
+    .project-star:focus-visible {
+      color: var(--warm);
+      filter: drop-shadow(0 0 18px rgba(244, 198, 109, 0.95));
+      transform: scale(1.12);
+      animation: none;
+      outline: none;
+    }
+
+    @keyframes star-breathe {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.18);
+      }
+    }
+
+    @media (max-width: 760px) {
+      .site-nav {
+        width: 64px;
+      }
+
+      .site-nav ul {
+        gap: 28px;
+      }
+
+      .site-nav a {
+        min-height: 78px;
+        font-size: 0.68rem;
+      }
+
+      main {
+        margin-left: 64px;
+      }
+
+      .page-section {
+        padding: 56px 22px;
+      }
+
+      .page-section::before {
+        background-attachment: scroll;
+      }
+
+      .about-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .about-decoration {
+        left: -32px;
+        height: 108%;
+        max-height: 108vh;
+        opacity: 0.13;
+      }
+
+      .about-image {
+        width: min(100%, 340px);
+        aspect-ratio: 0.72;
+      }
+
+      .about-copy {
+        margin-left: 0;
+        transform: none;
+      }
+
+      .star-field {
+        width: 100%;
+        min-height: 420px;
+      }
+
+      .project-star:nth-child(1) {
+        left: 4%;
+      }
+
+      .project-star:nth-child(2) {
+        left: 52%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav" aria-label="Primary navigation">
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="page-section landing" id="home">
+      <div class="lava-layer" aria-hidden="true">
+        <div class="lava-blob"></div>
+        <div class="lava-blob"></div>
+        <div class="lava-blob"></div>
+        <div class="lava-blob"></div>
+        <div class="lava-blob"></div>
+      </div>
+      <div class="content">
+        <h1>Sky Flores</h1>
+        <p class="lead">An ongoing exploration of curiosities, experiments, and creative pursuits.</p>
+      </div>
+      <div class="scroll-cue">Scroll</div>
+    </section>
+
+    <section class="page-section about" id="about">
+      <img class="about-decoration" src="images/cross-stitch-flower.png" alt="">
+      <div class="about-layout">
+        <div class="about-image">
+          <img class="about-photo" src="images/about-photo.jpg" alt="Portrait of Skye Flores">
+        </div>
+        <div class="about-copy">
+          <h2>A Glimpse Into Me</h2>
+          <p>Hello! I'm Skye.</p>
+          <p>I'm currently an undergraduate student studying Biotechnology with a focus in Bioinformatics at the University of Houston, with plans to continue into graduate studies. I'm interested in exploring the intersection of biology, technology, and art, and finding ways to bring those fields together through creative projects.</p>
+          <p>Over the course of my degree, I've filled notebooks and journals with ideas that never made it much further than the page. This website is a place to finally start building some of them, while documenting the process along the way.</p>
+          <button class="contact-button" type="button" id="open-contact">Contact Me</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-section projects" id="projects">
+      <div class="night-layer" aria-hidden="true">
+        <div class="night-blob"></div>
+        <div class="night-blob"></div>
+        <div class="night-blob"></div>
+        <div class="night-blob"></div>
+        <div class="night-blob"></div>
+      </div>
+      <div class="content">
+        <h2>My Constellations</h2>
+        <p class="lead">A growing constellation of projects. Click a star to explore.</p>
+        <div class="star-field" aria-label="Project links">
+          <a class="project-star" href="project-one.html" aria-label="Open project one">*</a>
+          <a class="project-star" href="project-two.html" aria-label="Open project two">*</a>
+          <a class="project-star" href="project-three.html" aria-label="Open project three">*</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="contact-overlay" id="contact-overlay" aria-hidden="true">
+    <div class="contact-card" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+      <button class="contact-close" type="button" id="close-contact" aria-label="Close contact panel">x</button>
+      <h2 id="contact-title">Contact</h2>
+      <div class="contact-entry">
+        <strong>Email</strong>
+        <span>skyerichardson2703@gmail.com</span>
+      </div>
+      <div class="contact-entry">
+        <strong>Instagram</strong>
+        <span>@ilhuicatlanextil</span>
+      </div>
+      <div class="contact-entry">
+        <strong>Pinterest</strong>
+        <span>@sky_flores_sky</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const landingSection = document.querySelector(".landing");
+    const lavaBlobs = document.querySelectorAll(".lava-blob");
+    const openContactButton = document.getElementById("open-contact");
+    const closeContactButton = document.getElementById("close-contact");
+    const contactOverlay = document.getElementById("contact-overlay");
+    const contactCard = document.querySelector(".contact-card");
+
+    if (openContactButton && closeContactButton && contactOverlay && contactCard) {
+      const openContact = () => {
+        contactOverlay.classList.add("is-open");
+        contactOverlay.setAttribute("aria-hidden", "false");
+      };
+
+      const closeContact = () => {
+        contactOverlay.classList.remove("is-open");
+        contactOverlay.setAttribute("aria-hidden", "true");
+      };
+
+      openContactButton.addEventListener("click", openContact);
+      closeContactButton.addEventListener("click", closeContact);
+      contactOverlay.addEventListener("click", closeContact);
+      contactCard.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && contactOverlay.classList.contains("is-open")) {
+          closeContact();
+        }
+      });
+    }
+
+    if (landingSection && lavaBlobs.length) {
+      const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+      const lerp = (start, end, amount) => start + (end - start) * amount;
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      let pointerTarget = { x: 24, y: 34 };
+      let pointerCurrent = { x: 24, y: 34 };
+      let pointerStrength = 0;
+      let lastPointerAt = 0;
+
+      const blobPaths = [
+        { x: -16, y: -10, ampX: 24, ampY: 18, speedX: 0.17, speedY: 0.23, phase: 0.2, scaleX: 1.45, scaleY: 0.82, pull: 0.24 },
+        { x: 48, y: -8, ampX: 28, ampY: 20, speedX: 0.14, speedY: 0.19, phase: 1.8, scaleX: 1.08, scaleY: 1.18, pull: 0.18 },
+        { x: 8, y: 42, ampX: 22, ampY: 26, speedX: 0.12, speedY: 0.16, phase: 3.1, scaleX: 1.6, scaleY: 0.72, pull: 0.12 },
+        { x: 32, y: 18, ampX: 26, ampY: 22, speedX: 0.11, speedY: 0.15, phase: 4.4, scaleX: 1.55, scaleY: 1.02, pull: 0.08 },
+        { x: -6, y: 60, ampX: 32, ampY: 18, speedX: 0.16, speedY: 0.13, phase: 5.6, scaleX: 0.88, scaleY: 1.48, pull: 0.2 }
+      ];
+
+      const updatePointerTarget = (event) => {
+        const rect = landingSection.getBoundingClientRect();
+        pointerTarget = {
+          x: clamp(((event.clientX - rect.left) / rect.width) * 100, 0, 100),
+          y: clamp(((event.clientY - rect.top) / rect.height) * 100, 0, 100)
+        };
+        pointerStrength = 1;
+        lastPointerAt = performance.now();
+      };
+
+      const animateLavaGradient = (time) => {
+        const seconds = time / 1000;
+        const idleGlow = {
+          x: 24 + Math.sin(seconds * 0.24) * 18 + Math.cos(seconds * 0.13) * 9,
+          y: 34 + Math.cos(seconds * 0.2) * 20
+        };
+
+        pointerCurrent.x = lerp(pointerCurrent.x, pointerTarget.x, 0.045);
+        pointerCurrent.y = lerp(pointerCurrent.y, pointerTarget.y, 0.045);
+
+        if (time - lastPointerAt > 1600) {
+          pointerStrength = lerp(pointerStrength, 0, 0.014);
+        }
+
+        const glowX = lerp(idleGlow.x, pointerCurrent.x, pointerStrength * 0.68);
+        const glowY = lerp(idleGlow.y, pointerCurrent.y, pointerStrength * 0.68);
+        landingSection.style.setProperty("--glow-x", `${clamp(glowX, 0, 100)}%`);
+        landingSection.style.setProperty("--glow-y", `${clamp(glowY, 0, 100)}%`);
+
+        lavaBlobs.forEach((blob, index) => {
+          const path = blobPaths[index];
+          const twist = seconds + path.phase;
+          const pullX = (pointerCurrent.x - 50) * path.pull * pointerStrength;
+          const pullY = (pointerCurrent.y - 50) * path.pull * pointerStrength;
+          const x = path.x + Math.sin(seconds * path.speedX + path.phase) * path.ampX + Math.cos(seconds * 0.07 + path.phase) * 10 + pullX;
+          const y = path.y + Math.cos(seconds * path.speedY + path.phase) * path.ampY + Math.sin(seconds * 0.09 + path.phase) * 8 + pullY;
+          const rotation = Math.sin(twist * 0.42) * 38 + Math.cos(twist * 0.21) * 22;
+          const stretchX = path.scaleX + Math.sin(twist * 0.58) * 0.24;
+          const stretchY = path.scaleY + Math.cos(twist * 0.46) * 0.2;
+          const radiusA = 42 + Math.sin(twist * 0.55) * 12;
+          const radiusB = 58 + Math.cos(twist * 0.47) * 14;
+          const radiusC = 48 + Math.sin(twist * 0.39 + 1.7) * 13;
+          const radiusD = 52 + Math.cos(twist * 0.51 + 0.6) * 12;
+
+          blob.style.transform = `translate3d(${x}vw, ${y}vh, 0) rotate(${rotation}deg) scale(${stretchX}, ${stretchY})`;
+          blob.style.borderRadius = `${radiusA}% ${radiusB}% ${radiusC}% ${radiusD}% / ${radiusD}% ${radiusC}% ${radiusB}% ${radiusA}%`;
+        });
+
+        window.requestAnimationFrame(animateLavaGradient);
+      };
+
+      window.addEventListener("pointermove", updatePointerTarget);
+      window.addEventListener("pointerdown", updatePointerTarget);
+
+      if (prefersReducedMotion) {
+        lavaBlobs.forEach((blob, index) => {
+          const path = blobPaths[index];
+          blob.style.transform = `translate3d(${path.x}vw, ${path.y}vh, 0) scale(${path.scaleX}, ${path.scaleY})`;
+        });
+      } else {
+        window.requestAnimationFrame(animateLavaGradient);
+      }
+    }
+  </script>
+</body>
+</html>
